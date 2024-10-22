@@ -1,0 +1,56 @@
+#运管242 刘启秀242151222 张琨旭242151217  罗永鑫242151221
+import datetime
+
+class TicketSystem:
+    def __init__(self):
+        self.tickets = {}  # 存储票务信息的字典
+        self.purchase_records = []  # 购票记录列表
+    def add_ticket(self):
+        ticket_info = input("请输入票种、价格、购票日期（格式：YYYY-MM-DD）、乘客姓名：")
+        fields = ticket_info.split(',')
+        if len(fields) != 4:
+            print("输入错误，请按照指定格式提供信息。")
+            return
+        try:
+            date = datetime.datetime.strptime(fields[1], "%Y-%m-%d").date()
+        except ValueError:
+            print("购票日期格式错误，请确保为YYYY-MM-DD格式。")
+            return
+        self.tickets[fields[0]] = {
+            'price': float(fields[1]),
+            'purchase_date': date,
+            'passenger_name': fields[3]
+        }
+        print("票务信息添加成功。")
+    def add_purchase_record(self, ticket_type, passenger_name):
+        self.purchase_records.append({
+            'ticket_type': ticket_type,
+            'passenger_name': passenger_name,
+            'purchase_date': datetime.date.today(),
+        })
+        print(f"{ticket_type}已购买，购买者：{passenger_name}")
+    def generate_report(self):
+        total_sales = {ticket: {'count': 0, 'income': 0} for ticket in self.tickets.keys()}
+        for record in self.purchase_records:
+            total_sales[record['ticket_type']]['count'] += 1
+            total_sales[record['ticket_type']]['income'] += self.tickets[record['ticket_type']]['price']
+        report_date = datetime.date.today().strftime("%Y年%m月%d日")
+        print("\n票务统计报告:")
+        print(f"报告标题：轨道交通票务销售报告 ({report_date})\n")
+        for ticket, stats in total_sales.items():
+            print(f"{ticket}: 销售数量：{stats['count']}，总收入：{stats['income']}元")
+ticket_system = TicketSystem()
+while True:
+    user_input = input("请选择操作：1.添加票务信息；2.购买门票；3.生成报告；4.退出\n")
+    if user_input == "1":
+        ticket_system.add_ticket()
+    elif user_input == "2":
+        ticket_type = input("请输入票种：")
+        passenger_name = input("请输入乘客姓名：")
+        ticket_system.add_purchase_record(ticket_type, passenger_name)
+    elif user_input == "3":
+        ticket_system.generate_report()
+    elif user_input == "4":
+        break
+    else:
+        print("无效选项，请重新选择。")
